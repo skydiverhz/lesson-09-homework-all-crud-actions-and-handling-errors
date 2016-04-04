@@ -17,15 +17,16 @@ class ArticlesController < ApplicationController
   def create
     # using data from "new: form -creates the new article record
     @article = Article.new(article_params)
+
     if @article.save
       flash[:notice] = "Your article was created!"
     # redirects to the index list (view)
       redirect_to articles_path(@article)
     else
+      # article creation failed
+      flash.now[:error] = "Error! Please try again!"
       # goes back to new form
       render :new
-      # article creation failed
-      flash[:notice] = "Error! Please try again!"
     end
   end
 
@@ -38,10 +39,10 @@ class ArticlesController < ApplicationController
     # uses the id from the url to find the record
     @article = Article.find(params[:id])
     # changes the article record from the edit form
-    if @article.update(article_params)
-      flash[:notice] = "Your article was updated!"
+    
+    if @article.update(article_params,)
+      redirect_to article_path(@article) notice: "Your article was updated!"
     # redirects to the show page with the updated record
-      redirect_to article_path(@article)
     else
       flash.now[:error] = "An error prevented the article from being updated"
       render :edit      
@@ -53,9 +54,9 @@ class ArticlesController < ApplicationController
     @article = Article.find(params[:id])
     # deletes the resource
     @article.destroy
-    # flash[:notice] = "Your article was deleted!"
+    
     # send to index (list) view
-    redirect_to articles_path 
+    redirect_to articles_path, notice: "Your article was deleted!" 
   end
 
   def delete
@@ -64,10 +65,9 @@ class ArticlesController < ApplicationController
 
   private
 
-  
+
   def article_params
     # defines the only allowed attributes
     params.require(:article).permit(:article_name, :first_name,:last_name, :universe, :bio)
   end
-
 end
